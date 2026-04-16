@@ -26,6 +26,10 @@ interface LinkedinResult {
   status: CheckStatus;
 }
 
+function toCheckStatus(status: ExternalVerificationResult["github"]["status"]): CheckStatus {
+  return status === "verified" ? "verified" : status === "not_found" ? "not_found" : "idle";
+}
+
 export default function ExternalVerification() {
   const [, setLocation] = useLocation();
   const { extractedData, fileId, analysisResult, setExternalVerification, setAnalysisResult } = useResumeStore();
@@ -59,14 +63,15 @@ export default function ExternalVerification() {
     setGithubResult(null);
     try {
       const result = await verifyGitHub(githubUrl);
-      setGithubStatus(result.status);
+      const nextStatus = toCheckStatus(result.status);
+      setGithubStatus(nextStatus);
       setGithubResult({
         username: result.username,
         repoCount: result.repoCount,
         followers: result.followers,
-        status: result.status,
+        status: nextStatus,
       });
-      if (result.status === "verified") {
+      if (nextStatus === "verified") {
         toast({ title: "GitHub Verified", description: `Found ${result.repoCount} repositories for @${result.username}` });
       } else {
         toast({ title: "GitHub Not Found", description: "No matching profile found.", variant: "destructive" });
@@ -82,13 +87,14 @@ export default function ExternalVerification() {
     setLinkedinResult(null);
     try {
       const result = await verifyLinkedIn(linkedinUrl);
-      setLinkedinStatus(result.status);
+      const nextStatus = toCheckStatus(result.status);
+      setLinkedinStatus(nextStatus);
       setLinkedinResult({
         profileDetected: result.profileDetected,
         connections: result.connections,
-        status: result.status,
+        status: nextStatus,
       });
-      if (result.status === "verified") {
+      if (nextStatus === "verified") {
         toast({ title: "LinkedIn Verified", description: "Professional profile successfully detected." });
       } else {
         toast({ title: "LinkedIn Not Found", description: "No matching profile found.", variant: "destructive" });
@@ -110,9 +116,13 @@ export default function ExternalVerification() {
   const handleContinue = async () => {
     setContinuing(true);
     try {
+      if (!fileId) {
+        throw new Error("Missing file ID. Please upload the resume again.");
+      }
+
       const ghVerified = githubStatus === "verified";
       const liVerified = linkedinStatus === "verified";
-      const confidenceBoost = (ghVerified ? 20 : 0) + (liVerified ? 15 : 0) + (ghVerified && liVerified ? -10 : 0);
+      const confidenceBoost = (ghVerified ? 20 : 0) + (liVerified ? 15 : 0);
 
       const extResult: ExternalVerificationResult = {
         github: {
@@ -133,13 +143,14 @@ export default function ExternalVerification() {
 
       setExternalVerification(extResult);
 
-      const analysis = await analyzeResume(fileId ?? "test", extractedData.email, extResult);
+      const analysis = await analyzeResume(fileId, extractedData.email, extResult);
       setAnalysisResult(analysis);
       setRedirectPending(true);
 
       toast({ title: "Analysis Complete!", description: "Your full verification report is ready." });
-    } catch {
-      toast({ title: "Error", description: "Could not complete analysis. Please try again.", variant: "destructive" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not complete analysis. Please try again.";
+      toast({ title: "Error", description: message, variant: "destructive" });
       setContinuing(false);
     }
   };
