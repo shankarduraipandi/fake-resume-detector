@@ -47,33 +47,6 @@ def extract_resume_data(resume_text: str, file_path: str) -> dict:
     if resume_text and current_app.config.get("GEMINI_API_KEY"):
         try:
             prompt = f"""
-You are helping a college project backend extract resume details.
-Return only valid JSON with these exact keys:
-name, email, phone, skills, experience, education, location
-
-Rules:
-- skills must be an array of strings
-- if a value is missing, use "Not mentioned"
-- do not add extra keys
-
-Resume text:
-{resume_text[:12000]}
-"""
-            raw_output = _call_gemini(prompt)
-            parsed = _normalize_extracted_data(_load_json(raw_output), file_path, resume_text)
-            print("[GEMINI] Resume extraction completed using Gemini.")
-            return parsed
-        except Exception as error:
-            print(f"[GEMINI] Extraction failed, using fallback data. Error: {error}")
-
-    print("[GEMINI] Using fallback extracted data.")
-    return _fallback_extracted_data(resume_text, file_path)
-
-
-def validate_resume_consistency(extracted_data: dict) -> dict:
-    if extracted_data and current_app.config.get("GEMINI_API_KEY"):
-        try:
-            prompt = f"""
 You are an accurate resume parser.
 
 Extract ONLY the candidate's personal details from the resume.
@@ -94,6 +67,29 @@ STRICT RULES:
 - DO NOT return explanations
 
 Resume text:
+{resume_text[:12000]}
+"""
+            raw_output = _call_gemini(prompt)
+            parsed = _normalize_extracted_data(_load_json(raw_output), file_path, resume_text)
+            print("[GEMINI] Resume extraction completed using Gemini.")
+            return parsed
+        except Exception as error:
+            print(f"[GEMINI] Extraction failed, using fallback data. Error: {error}")
+
+    print("[GEMINI] Using fallback extracted data.")
+    return _fallback_extracted_data(resume_text, file_path)
+
+
+def validate_resume_consistency(extracted_data: dict) -> dict:
+    if extracted_data and current_app.config.get("GEMINI_API_KEY"):
+        try:
+            prompt = f"""
+You are validating resume consistency for a college project.
+Return only valid JSON with:
+consistent: boolean
+reason: string
+
+Resume data:
 {json.dumps(extracted_data, indent=2)}
 """
             raw_output = _call_gemini(prompt)
