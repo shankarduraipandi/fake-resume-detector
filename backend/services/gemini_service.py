@@ -74,12 +74,26 @@ def validate_resume_consistency(extracted_data: dict) -> dict:
     if extracted_data and current_app.config.get("GEMINI_API_KEY"):
         try:
             prompt = f"""
-You are validating resume consistency for a college project.
-Return only valid JSON with:
-consistent: boolean
-reason: string
+You are an accurate resume parser.
 
-Resume data:
+Extract ONLY the candidate's personal details from the resume.
+
+Return ONLY valid JSON with these exact keys:
+name, email, phone, skills, experience, education, location
+
+STRICT RULES:
+- "name" MUST be the candidate's full name (usually at top, not summary or title)
+- DO NOT return summary/objective as name
+- If multiple lines exist, choose the most probable human name
+- email MUST be a valid email
+- phone MUST be a valid phone number
+- skills MUST be an array of strings
+- DO NOT hallucinate values
+- If not found, return "Not mentioned"
+- DO NOT add extra keys
+- DO NOT return explanations
+
+Resume text:
 {json.dumps(extracted_data, indent=2)}
 """
             raw_output = _call_gemini(prompt)

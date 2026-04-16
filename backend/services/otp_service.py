@@ -15,20 +15,22 @@ OTP_EXPIRY_MINUTES = 10
 def generate_and_send_otp(phone: str | None = None, email: str | None = None) -> dict:
     contact = _resolve_contact(phone=phone, email=email)
     if not contact:
-        return {"success": False, "message": "Phone number or email is required."}
+        return {"success": False, "message": "A valid mobile number is required for OTP verification."}
 
     otp = f"{random.randint(0, 999999):06d}"
     verification = OTPVerification(phone=contact, otp=otp, is_verified=False)
     db.session.add(verification)
     db.session.commit()
-
+    print(f"[OTP] OTP for {contact}: {otp}")
     delivered_via = "console"
     try:
         sid = current_app.config.get("TWILIO_SID")
         auth_token = current_app.config.get("TWILIO_AUTH_TOKEN")
         from_phone = current_app.config.get("TWILIO_PHONE")
-
-        if not all([sid, auth_token, from_phone]) or "@" in contact:
+        print(sid)
+        print(auth_token)
+        print(from_phone)
+        if not all([sid, auth_token, from_phone]):
             raise ValueError("Twilio credentials missing or phone number unavailable.")
 
         client = Client(sid, auth_token)
@@ -57,7 +59,7 @@ def generate_and_send_otp(phone: str | None = None, email: str | None = None) ->
 def verify_otp_code(otp: str, phone: str | None = None, email: str | None = None) -> dict:
     contact = _resolve_contact(phone=phone, email=email)
     if not contact:
-        return {"success": False, "message": "Phone number or email is required."}
+        return {"success": False, "message": "A valid mobile number is required for OTP verification."}
 
     latest_record = (
         OTPVerification.query.filter_by(phone=contact)
@@ -107,7 +109,6 @@ def _resolve_contact(phone: str | None = None, email: str | None = None) -> str 
     if normalized_email:
         user = User.query.filter_by(email=normalized_email).first()
         if user and user.phone:
-            return user.phone
-        return normalized_email
+            return normalize_phone(user.phone)
 
     return None

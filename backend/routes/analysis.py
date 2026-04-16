@@ -11,6 +11,21 @@ from utils.responses import error_response
 analysis_bp = Blueprint("analysis", __name__)
 
 
+def build_report_response(resume: Resume) -> dict:
+    report_data = resume.report_data or {}
+    external_verification = resume.external_verification
+
+    return {
+        "status": report_data.get("status", "Suspicious"),
+        "score": report_data.get("score", resume.score or 0),
+        "fakeProbability": report_data.get("fakeProbability", resume.fake_probability or 0),
+        "extractedData": resume.extracted_data or {},
+        "jobSuggestions": report_data.get("jobSuggestions", []),
+        "details": report_data.get("details", []),
+        "externalVerification": external_verification,
+    }
+
+
 @analysis_bp.route("/calculate-score", methods=["POST"])
 def calculate_score():
     payload = get_request_data(request)
@@ -59,6 +74,17 @@ def job_suggestions():
     )
 
 
+@analysis_bp.route("/report/<int:file_id>", methods=["GET"])
+def get_report(file_id: int):
+    resume = Resume.query.get(file_id)
+    if not resume:
+        return error_response("Resume file not found.", 404)
+    if not resume.report_data:
+        return error_response("No saved report found for this resume.", 404)
+
+    return jsonify(build_report_response(resume))
+
+
 @analysis_bp.route("/analyze", methods=["POST"])
 def analyze_resume():
     payload = get_request_data(request)
@@ -83,20 +109,18 @@ def analyze_resume():
     job_suggestions_data = suggest_job_roles(resume.extracted_data.get("skills", []))
     external_verification = payload.get("externalVerification") or payload.get(
         "external_verification"
-    )
+    ) or resume.external_verification
 
     resume.score = score_data["score"]
     resume.fake_probability = score_data["fakeProbability"]
+    resume.external_verification = external_verification
+    resume.report_data = {
+        "status": score_data["status"],
+        "score": score_data["score"],
+        "fakeProbability": score_data["fakeProbability"],
+        "details": score_data["details"],
+        "jobSuggestions": job_suggestions_data,
+    }
     db.session.commit()
 
-    return jsonify(
-        {
-            "status": score_data["status"],
-            "score": score_data["score"],
-            "fakeProbability": score_data["fakeProbability"],
-            "extractedData": resume.extracted_data,
-            "jobSuggestions": job_suggestions_data,
-            "details": score_data["details"],
-            "externalVerification": external_verification,
-        }
-    )
+    return jsonify(build_report_response(resume))

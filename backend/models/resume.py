@@ -10,6 +10,8 @@ class Resume(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     file_path = db.Column(db.String(500), nullable=False)
     extracted_data = db.Column(db.JSON, nullable=True)
+    external_verification = db.Column(db.JSON, nullable=True)
+    report_data = db.Column(db.JSON, nullable=True)
     score = db.Column(db.Integer, nullable=True)
     fake_probability = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

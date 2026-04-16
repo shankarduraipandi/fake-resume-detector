@@ -202,9 +202,21 @@ export default function Result() {
                     )}
                   </div>
                   {extV.github.status === "verified" && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      @{extV.github.username} &middot; {extV.github.repoCount} repositories found
-                    </p>
+                    <>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        @{extV.github.username} &middot; {extV.github.repoCount} repositories found
+                      </p>
+                    </>
+                  )}
+                  {extV.github.url && (
+                    <a
+                      href={extV.github.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-primary hover:underline break-all"
+                    >
+                      {extV.github.url}
+                    </a>
                   )}
                 </div>
                 <span className={`text-xs font-black shrink-0 ${extV.github.status === "verified" ? "text-emerald-600" : "text-muted-foreground"}`}>
@@ -231,9 +243,21 @@ export default function Result() {
                     )}
                   </div>
                   {extV.linkedin.status === "verified" && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Profile detected &middot; {extV.linkedin.connections} connections
-                    </p>
+                    <>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Profile detected &middot; {extV.linkedin.connections} connections
+                      </p>
+                    </>
+                  )}
+                  {extV.linkedin.url && (
+                    <a
+                      href={extV.linkedin.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-primary hover:underline break-all"
+                    >
+                      {extV.linkedin.url}
+                    </a>
                   )}
                 </div>
                 <span className={`text-xs font-black shrink-0 ${extV.linkedin.status === "verified" ? "text-emerald-600" : "text-muted-foreground"}`}>

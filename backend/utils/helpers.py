@@ -12,6 +12,8 @@ PLACEHOLDER_VALUES = {
     "not mentioned",
 }
 
+DEFAULT_COUNTRY_CODE = "91"
+
 
 def get_request_data(request):
     return request.get_json(silent=True) or request.form.to_dict() or {}
@@ -58,20 +60,32 @@ def normalize_phone(value):
     if not cleaned:
         return None
 
-    cleaned = cleaned.replace(" ", "")
-    if cleaned.startswith("00"):
-        cleaned = f"+{cleaned[2:]}"
-
-    if cleaned.startswith("+"):
-        digits = "+" + re.sub(r"\D", "", cleaned)
-        return digits
-
     digits_only = re.sub(r"\D", "", cleaned)
     if not digits_only:
         return None
-    if len(digits_only) >= 10:
+
+    if digits_only.startswith("00"):
+        digits_only = digits_only[2:]
+
+    # Default local 10-digit numbers to India (+91).
+    if len(digits_only) == 10:
+        return f"+{DEFAULT_COUNTRY_CODE}{digits_only}"
+
+    # Handle numbers written as 0XXXXXXXXXX.
+    if len(digits_only) == 11 and digits_only.startswith("0"):
+        return f"+{DEFAULT_COUNTRY_CODE}{digits_only[1:]}"
+
+    # Preserve valid Indian numbers already carrying the country code.
+    if len(digits_only) >= 12 and digits_only.startswith(DEFAULT_COUNTRY_CODE):
         return f"+{digits_only}"
-    return digits_only
+
+    if cleaned.startswith("+"):
+        return f"+{digits_only}"
+
+    if len(digits_only) > 10:
+        return f"+{digits_only}"
+
+    return None
 
 
 def title_from_filename(filename: str) -> str:

@@ -222,10 +222,24 @@ export async function extractResumeData(fileId: string): Promise<ExtractedData> 
   return normalizeExtractedData(extractedPayload);
 }
 
-export async function sendOtp(email: string): Promise<{ success: boolean; message: string }> {
+export async function updateResumeDetails(fileId: string, extractedData: ExtractedData): Promise<ExtractedData> {
+  const payload = await apiRequest<Record<string, unknown>>(`/resume/${fileId}/details`, {
+    method: "PUT",
+    body: JSON.stringify(extractedData),
+  });
+
+  const extractedPayload =
+    (payload.extractedData as Partial<ExtractedData> | undefined)
+    ?? (payload.extracted_data as Partial<ExtractedData> | undefined)
+    ?? (payload as Partial<ExtractedData>);
+
+  return normalizeExtractedData(extractedPayload);
+}
+
+export async function sendOtp(phone: string): Promise<{ success: boolean; message: string }> {
   const payload = await apiRequest<ApiSuccessMessage>("/send-otp", {
     method: "POST",
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ phone }),
   });
 
   return {
@@ -234,11 +248,11 @@ export async function sendOtp(email: string): Promise<{ success: boolean; messag
   };
 }
 
-export async function verifyOtp(otp: string, email: string): Promise<{ success: boolean; message: string }> {
+export async function verifyOtp(otp: string, phone: string): Promise<{ success: boolean; message: string }> {
   try {
     const payload = await apiRequest<ApiSuccessMessage>("/verify-otp", {
       method: "POST",
-      body: JSON.stringify({ otp, email }),
+      body: JSON.stringify({ otp, phone }),
     });
 
     return {
@@ -273,14 +287,15 @@ export async function verifyLinkedIn(url: string): Promise<ExternalVerificationR
 
 export async function analyzeResume(
   fileId: string,
-  email: string,
+  contact: Pick<ExtractedData, "email" | "phone">,
   externalVerification?: ExternalVerificationResult,
 ): Promise<AnalysisResult> {
   const payload = await apiRequest<Record<string, unknown>>("/analyze", {
     method: "POST",
     body: JSON.stringify({
       fileId,
-      email,
+      email: contact.email,
+      phone: contact.phone,
       externalVerification,
     }),
   });

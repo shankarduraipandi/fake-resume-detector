@@ -21,6 +21,11 @@ export default function OtpVerify() {
     return null;
   }
 
+  if (!extractedData.phone || extractedData.phone === "Not mentioned") {
+    setLocation("/details");
+    return null;
+  }
+
   const handleOtpChange = (i: number, val: string) => {
     if (!/^\d*$/.test(val)) return;
     const next = [...otp];
@@ -57,7 +62,7 @@ export default function OtpVerify() {
     setVerifying(true);
     setError(null);
     try {
-      const result = await verifyOtp(code, extractedData.email);
+      const result = await verifyOtp(code, extractedData.phone);
       if (!result.success) {
         setError(result.message);
         toast({ title: "Verification Failed", description: result.message, variant: "destructive" });
@@ -76,8 +81,8 @@ export default function OtpVerify() {
   const handleResend = async () => {
     setResending(true);
     try {
-      await sendOtp(extractedData.email);
-      toast({ title: "OTP Resent", description: `A new code was sent to ${extractedData.email}` });
+      await sendOtp(extractedData.phone);
+      toast({ title: "OTP Resent", description: `A new code was sent to ${extractedData.phone}` });
       setOtp(["", "", "", "", "", ""]);
       setError(null);
     } catch {
@@ -96,7 +101,7 @@ export default function OtpVerify() {
         <div className="mb-8">
           <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">Step 3 of 5</span>
           <h1 className="text-3xl font-bold text-foreground mt-3 mb-1.5">Verify Identity</h1>
-          <p className="text-muted-foreground text-sm">Enter the 6-digit code sent to your email.</p>
+          <p className="text-muted-foreground text-sm">Enter the 6-digit code sent to the candidate's mobile number.</p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-7 shadow-sm">
@@ -105,10 +110,10 @@ export default function OtpVerify() {
               <KeyRound className="w-6.5 h-6.5 text-primary" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Code sent to <span className="font-semibold text-foreground">{extractedData.email}</span>
+              Enter the 6-digit code sent for <span className="font-semibold text-foreground">{extractedData.phone}</span>
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Hint: Enter any 6-digit code (e.g. <span className="font-mono font-semibold">123456</span>) to verify. Enter <span className="font-mono font-semibold">000000</span> to simulate failure.
+              If delivery is mocked or SMS is unavailable, the generated OTP is logged by the backend.
             </p>
           </div>
 

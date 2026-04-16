@@ -32,16 +32,36 @@ function toCheckStatus(status: ExternalVerificationResult["github"]["status"]): 
 
 export default function ExternalVerification() {
   const [, setLocation] = useLocation();
-  const { extractedData, fileId, analysisResult, setExternalVerification, setAnalysisResult } = useResumeStore();
+  const { extractedData, fileId, analysisResult, externalVerification, setExternalVerification, setAnalysisResult } = useResumeStore();
   const { toast } = useToast();
 
-  const [githubUrl, setGithubUrl] = useState("https://github.com/priya-sharma-dev");
-  const [linkedinUrl, setLinkedinUrl] = useState("https://linkedin.com/in/priya-sharma");
+  const savedGithubStatus = externalVerification ? toCheckStatus(externalVerification.github.status) : "idle";
+  const savedLinkedinStatus = externalVerification ? toCheckStatus(externalVerification.linkedin.status) : "idle";
 
-  const [githubStatus, setGithubStatus] = useState<CheckStatus>("idle");
-  const [linkedinStatus, setLinkedinStatus] = useState<CheckStatus>("idle");
-  const [githubResult, setGithubResult] = useState<GithubResult | null>(null);
-  const [linkedinResult, setLinkedinResult] = useState<LinkedinResult | null>(null);
+  const [githubUrl, setGithubUrl] = useState(externalVerification?.github.url ?? "");
+  const [linkedinUrl, setLinkedinUrl] = useState(externalVerification?.linkedin.url ?? "");
+
+  const [githubStatus, setGithubStatus] = useState<CheckStatus>(savedGithubStatus);
+  const [linkedinStatus, setLinkedinStatus] = useState<CheckStatus>(savedLinkedinStatus);
+  const [githubResult, setGithubResult] = useState<GithubResult | null>(
+    externalVerification?.github.url
+      ? {
+          username: externalVerification.github.username,
+          repoCount: externalVerification.github.repoCount,
+          followers: externalVerification.github.followers,
+          status: savedGithubStatus,
+        }
+      : null,
+  );
+  const [linkedinResult, setLinkedinResult] = useState<LinkedinResult | null>(
+    externalVerification?.linkedin.url
+      ? {
+          profileDetected: externalVerification.linkedin.profileDetected,
+          connections: externalVerification.linkedin.connections,
+          status: savedLinkedinStatus,
+        }
+      : null,
+  );
 
   const [continuing, setContinuing] = useState(false);
   const [redirectPending, setRedirectPending] = useState(false);
@@ -143,7 +163,14 @@ export default function ExternalVerification() {
 
       setExternalVerification(extResult);
 
-      const analysis = await analyzeResume(fileId, extractedData.email, extResult);
+      const analysis = await analyzeResume(
+        fileId,
+        {
+          email: extractedData.email,
+          phone: extractedData.phone,
+        },
+        extResult,
+      );
       setAnalysisResult(analysis);
       setRedirectPending(true);
 

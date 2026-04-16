@@ -1,14 +1,36 @@
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
- * Running on http://10.162.237.47:5000
+ * Running on http://192.168.1.2:5000
 Press CTRL+C to quit
-127.0.0.1 - - [15/Apr/2026 18:32:11] "GET /health HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:36:39] "POST /upload HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:36:40] "OPTIONS /extract HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:36:40] "POST /extract HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:40:32] "POST /upload HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:40:32] "OPTIONS /extract HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:40:33] "POST /extract HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:40:47] "OPTIONS /send-otp HTTP/1.1" 200 -
-127.0.0.1 - - [15/Apr/2026 18:40:48] "POST /send-otp HTTP/1.1" 400 -
+127.0.0.1 - - [16/Apr/2026 09:41:17] "POST /upload HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:41:18] "OPTIONS /extract HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:41:19] "POST /extract HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:41:51] "OPTIONS /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:41:51] "PUT /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:41:51] "OPTIONS /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:41:52] "POST /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:46:29] "OPTIONS /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:46:30] "PUT /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:46:30] "OPTIONS /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:46:30] "POST /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:48:46] "OPTIONS /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:48:46] "PUT /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:48:46] "OPTIONS /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:48:47] "POST /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:52:55] "OPTIONS /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:52:55] "PUT /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:52:55] "OPTIONS /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:52:56] "POST /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:59:58] "OPTIONS /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:59:59] "PUT /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:59:59] "OPTIONS /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 09:59:59] "POST /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:08] "OPTIONS /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:09] "PUT /resume/2/details HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:09] "OPTIONS /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:09] "POST /send-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:21] "OPTIONS /verify-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:22] "POST /verify-otp HTTP/1.1" 400 -
+127.0.0.1 - - [16/Apr/2026 10:01:27] "OPTIONS /verify-otp HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2026 10:01:28] "POST /verify-otp HTTP/1.1" 200 -
